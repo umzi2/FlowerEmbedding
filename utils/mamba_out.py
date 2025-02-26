@@ -228,12 +228,9 @@ class MambaOut(nn.Module):
             cur += depths[i]
 
         self.norm = output_norm(dims[-1])
-
-        # if head_dropout > 0.0:
+        # self.embedded_eval = embedded
         self.head = head_fn(dims[-1], num_classes, head_dropout=head_dropout)
-        # else:
-        #     self.head = head_fn(dims[-1], num_classes)
-        self.embeded = head_fn(dims[-1], 128)
+        self.head_embed = head_fn(dims[-1], 128)
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
@@ -254,9 +251,8 @@ class MambaOut(nn.Module):
 
     def forward(self, x):
         x = self.forward_features(x)
+        # if self.embedded_eval:
+        #     return F.normalize(self.embedded(x), dim=1)
         classing = self.head(x)
-        embed = F.normalize(self.embeded(x), dim=1)
+        embed = F.normalize(self.head_embed(x), dim=1)
         return classing, embed
-
-
-

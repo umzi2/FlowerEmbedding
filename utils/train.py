@@ -1,4 +1,3 @@
- 
 import numpy as np
 import torch
 import torch.nn as nn
@@ -10,7 +9,6 @@ from tqdm import tqdm
 from utils.adan_sf import adan_sf
 from utils.dataloader import ImageDataset
 import torch.multiprocessing as mp
-from utils.mamba_out import MambaOut
 import torch.nn.functional
 import random
 
@@ -153,9 +151,7 @@ class ImageClassifierTrainer:
             worker_init_fn=self._worker_init_fn if seed else None,
         )
 
-        self.val_loader = DataLoader(
-            ImageDataset(val_data_path, val=True)
-        )
+        self.val_loader = DataLoader(ImageDataset(val_data_path, val=True))
 
         # Пути
         self.checkpoint_dir = checkpoint_dir
@@ -182,8 +178,6 @@ class ImageClassifierTrainer:
             transforms.RandomVerticalFlip(flip_prob),
             transforms.RandomHorizontalFlip(flip_prob),
             Random90DegreeRotation(),
-            transforms.ColorJitter(0.25,0.25,0.25,0.25),
-            transforms.RandomGrayscale(),
         ]
 
         if use_cutout:
@@ -227,8 +221,8 @@ class ImageClassifierTrainer:
                 self.save_checkpoint(epoch, val_loss, best=True)
                 print("Best checkpoint saved!")
 
-            self.save_checkpoint(epoch, val_loss, best=False)
-            print("Regular checkpoint saved!")
+            # self.save_checkpoint(epoch, val_loss, best=False)
+            # print("Regular checkpoint saved!")
             torch.cuda.empty_cache()
 
     def validate(self):
@@ -287,6 +281,3 @@ class ImageClassifierTrainer:
         print(
             f"Loaded checkpoint from epoch {checkpoint['epoch']} with loss {checkpoint['loss']:.4f}"
         )
-
-
-
